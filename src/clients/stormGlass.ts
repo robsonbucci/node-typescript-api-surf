@@ -1,3 +1,4 @@
+import { InternalError } from '@src/util/errors/internal-error';
 import axios, { AxiosStatic } from 'axios';
 import 'dotenv/config';
 
@@ -30,6 +31,14 @@ export interface IForecastPoint {
   swellDirection: number;
 }
 
+export class ClientRequestError extends InternalError {
+  constructor(message: string) {
+    const internalMessage =
+      'Unexpected error when trying to communicate to StormGlass';
+    super(`${internalMessage}: ${message}`);
+  }
+}
+
 export class StormGlass {
   readonly stormGlassAPIParams =
     'swellDirection,swellHeight,swellPeriod,waveDirection,waveHeight,windDirection,windSpeed';
@@ -41,15 +50,19 @@ export class StormGlass {
     lat: number,
     lng: number
   ): Promise<IForecastPoint[]> {
-    const response = await this.request.get<IStormGlassForescastResponse>(
-      `https://api.stormglass.io/v2/weather/point?lat=${lat}&lng=${lng}&params=${this.stormGlassAPIParams}&source=${this.stormGlassAPISource}`,
-      {
-        headers: {
-          Authorization: process.env.API_STORMGLASS,
-        },
-      }
-    );
-    return this.normalizeResponse(response.data);
+    try {
+      const response = await this.request.get<IStormGlassForescastResponse>(
+        `https://api.stormglass.io/v2/weather/point?lat=${lat}&lng=${lng}&params=${this.stormGlassAPIParams}&source=${this.stormGlassAPISource}`,
+        {
+          headers: {
+            Authorization: process.env.API_STORMGLASS,
+          },
+        }
+      );
+      return this.normalizeResponse(response.data);
+    } catch (error: any) {
+      throw new ClientRequestError(error.message);
+    }
   }
 
   private normalizeResponse(
