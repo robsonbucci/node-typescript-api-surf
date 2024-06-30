@@ -7,6 +7,7 @@ jest.mock('axios');
 
 describe('StormGlass client', () => {
   const mockedAxios = axios as jest.Mocked<typeof axios>;
+
   it('should return the normalized forecast from the StormGalss service', async () => {
     const lat = -33.432879;
     const lng = 132.634564;
@@ -51,7 +52,7 @@ describe('StormGlass client', () => {
     );
   });
 
-  it('should get an StormGlassResponseError when the StormGlass service responds with error', async () => {
+  it('should get a StormGlassResponseError when the StormGlass service responds with error', async () => {
     const lat = -33.432879;
     const lng = 132.634564;
 
