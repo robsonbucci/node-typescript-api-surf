@@ -62,8 +62,6 @@ export class StormGlass {
     lat: number,
     lng: number
   ): Promise<IForecastPoint[]> {
-    console.log(stormGalssResourceConfig);
-
     try {
       const response = await this.request.get<IStormGlassForescastResponse>(
         `${stormGalssResourceConfig.get('apiUrl')}/weather/point?lat=${lat}&lng=${lng}&params=${this.stormGlassAPIParams}&source=${this.stormGlassAPISource}`,
@@ -75,7 +73,7 @@ export class StormGlass {
       );
       return this.normalizeResponse(response.data);
     } catch (error: any) {
-      if (error.response && error.response.status)
+      if (HTTPUtil.Request.isRequestError(error))
         throw new StormGlassResponseError(
           `Error: ${JSON.stringify(error.response.data)} Code: ${error.response.status}`
         );
