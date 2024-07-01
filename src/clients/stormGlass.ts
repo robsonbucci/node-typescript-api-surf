@@ -1,5 +1,5 @@
 import { InternalError } from '@src/util/errors/internal-error';
-import axios, { AxiosStatic } from 'axios';
+import * as HTTPUtil from '@src/util/request';
 import config, { IConfig } from 'config';
 
 export interface IStormGlassPointSource {
@@ -56,7 +56,7 @@ export class StormGlass {
     'swellDirection,swellHeight,swellPeriod,waveDirection,waveHeight,windDirection,windSpeed';
   readonly stormGlassAPISource = 'noaa';
 
-  constructor(protected request: AxiosStatic = axios) {}
+  constructor(protected request = new HTTPUtil.Request()) {}
 
   public async fetchPoints(
     lat: number,
